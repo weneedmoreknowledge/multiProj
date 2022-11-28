@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'signuppage.dart';
 import 'mainProcess/mainpage.dart';
 
@@ -30,7 +31,8 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/mainBack.jpeg'),
+          image: AssetImage('assets/images/loginMain.png'),
+          colorFilter: ColorFilter.mode(Colors.blueGrey, BlendMode.color),
           fit: BoxFit.cover,
         ),
       ),
@@ -42,6 +44,11 @@ class _LoginPageState extends State<LoginPage> {
           child:Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image(
+                image: AssetImage('assets/images/LOGO.png'),
+                width: 100,
+                height: 100,
+              ),
               Text(
                 'System\nIn & Out',
                 style: TextStyle(
