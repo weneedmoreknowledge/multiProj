@@ -41,89 +41,141 @@ class _LoginPageState extends State<LoginPage> {
         body:Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(32),
-          child:Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image(
-                image: AssetImage('assets/images/LOGO.png'),
-                width: 100,
-                height: 100,
-              ),
-              Text(
-                'System\nIn & Out',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 64,
+          child:SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 64,
                 ),
-              ),
-              SizedBox(height: 64,),
-              TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  hintText: 'Email',
-                  hintStyle: TextStyle(color: Colors.black),
-                  fillColor:Colors.white,
-                  filled: true,
+                Image(
+                  image: AssetImage('assets/images/LOGO.png'),
+                  width: 128,
+                  height: 128,
                 ),
-              ),
-              SizedBox(height: 16,),
-              TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                SizedBox(height: 32,),
+                Text(
+                  'Smart Check-in Check out System',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 20,
                   ),
-                  hintText: 'Password',
-                  hintStyle: TextStyle(color: Colors.black),
-                  fillColor:Colors.white,
-                  filled: true,
                 ),
-              ),
-              SizedBox(height: 32,),
-              SizedBox(
-                width: 256,
-                child: TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
+                SizedBox(height: 64,),
+                TextField(
+                  decoration: InputDecoration(
+                      hintText: "Enter your email",
+                      labelText: "Email",
+                      labelStyle: TextStyle(
+                          color: Colors.white
+                      ),
+                      hintStyle: TextStyle(
+                          color: Colors.white
+                      ),
+                      fillColor:Colors.transparent,
+                      filled: true,
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.white
+                        ),
+                      )
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MainPage()),
-                    );
-                  },
-                  child: const Text(
-                    'Login up',
-                    style: TextStyle(
-                        color: Colors.black
+                ),
+                SizedBox(height: 16,),
+                TextField(
+                  decoration: InputDecoration(
+                      hintText: 'Enter the Password',
+                      labelText: 'Password',
+                      labelStyle: TextStyle(
+                          color: Colors.white
+                      ),
+                      hintStyle: TextStyle(
+                          color: Colors.white
+                      ),
+                      fillColor:Colors.transparent,
+                      filled: true,
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.white
+                        ),
+                      )
+                  ),
+                ),
+                SizedBox(height: 32,),
+                SizedBox(
+                  height: 46,
+                  width: 256,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.orange),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MainPage()),
+                      );
+                    },
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16,),
-              SizedBox(
-                width: 256,
-                child: TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SignUpPage()),
-                    );
-                  },
-                  child: const Text(
-                    'Sign up',
-                    style: TextStyle(
-                        color: Colors.black
+                SizedBox(height: 16,),
+                SizedBox(
+                  height: 46,
+                  width: 256,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SignUpPage()),
+                      );
+                    },
+                    child: const Text(
+                      'Sign up',
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 64,),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Forgot password?',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: (){
+                        },
+                        child: Text(
+                          'Click here',
+                          style: TextStyle(
+                            color: Colors.cyan,
+                            fontSize: 18,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           )
         ),
       ),

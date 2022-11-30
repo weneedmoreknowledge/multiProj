@@ -1,5 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
+bool isChecked = false;
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -384,44 +386,135 @@ class FeedBackPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: MyScaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                IconButton(
-                    onPressed: (){
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(horizontal:16, vertical: 8),
+                child: Row(
+                  children: [
+                    IconButton(
+                        onPressed: (){
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.arrow_back_ios)
+                    ),
+                    Text(
+                      'Feedbacks',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              GridView.count(
+                physics: NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                childAspectRatio: 2.5,
+                children: [
+                  EnterInfoForm(textHint: 'UserName'),
+                  EnterInfoForm(textHint: 'Email Address'),
+                  EnterInfoForm(textHint: 'Phone Number'),
+                ],
+              ),
+              Container(
+                  margin: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                        child: Text('Your service rating'),),
+                      RatingBar.builder(
+                        initialRating: 3,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        onRatingUpdate: (rating) {
+                          print(rating);
+                        },
+                      ),
+                    ],
+                  )
+              ),
+              Container(
+                padding: EdgeInsets.all(8),
+                child: TextFormField(
+                  maxLines: 7,
+                  minLines: 7,
+                  decoration: InputDecoration(
+                    hintText: 'Additional Feedbacks',
+                    fillColor: Colors.white,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide(
+                          color: Color(0xFF4A3AFF),
+                          width: 2
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide(
+                        color: Color(0xFFEFF0F6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  CheckAgree(),
+                  Text('I have read and accept the Feedback Policy.'),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                child: SizedBox(
+                  height: 46,
+                  width: 256,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black),
+                    ),
+                    onPressed: () {
                       Navigator.pop(context);
                     },
-                    icon: Icon(Icons.arrow_back_ios)
-                ),
-                Text(
-                  'Feedbacks',
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
+                    ),
                   ),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                EnterInfoForm(textHint: 'UserName'),
-                EnterInfoForm(textHint: 'Email Address'),
-              ],
-            ),
-            EnterInfoForm(textHint: 'Phone Number'),
-            Container(
-              child: Text('Hello'),
-            ),
-            Container(
-              child: Text('Hello'),
-            ),
-          ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+//Display Pin Enter Page
+class PinPage extends StatelessWidget {
+  const PinPage({
+    Key? key
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
 
@@ -436,7 +529,6 @@ class EnterInfoForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(8),
-      width: 180,
       child: TextFormField(
         decoration: InputDecoration(
           labelText: textHint,
@@ -460,16 +552,35 @@ class EnterInfoForm extends StatelessWidget {
   }
 }
 
-
-//Display Pin Enter Page
-class PinPage extends StatelessWidget {
-  const PinPage({
-    Key? key
-  }) : super(key: key);
+class CheckAgree extends StatefulWidget {
+  const CheckAgree({Key? key}) : super(key: key);
 
   @override
+  State<CheckAgree> createState() => _CheckAgreeState();
+}
+class _CheckAgreeState extends State<CheckAgree> {
+  @override
   Widget build(BuildContext context) {
-    return Container();
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (isChecked==true) {
+        return Colors.blue;
+      }
+      return Colors.grey;
+    }
+    return Checkbox(
+      checkColor: Colors.white,
+      fillColor: MaterialStateProperty.resolveWith(getColor),
+      value: isChecked,
+      onChanged: (bool? value) {
+        setState(() {
+          isChecked = value!;
+        });
+      },
+    );
   }
 }
-
