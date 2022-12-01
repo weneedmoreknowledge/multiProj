@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'loginpage.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -69,7 +70,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   backgroundColor: MaterialStateProperty.all(Colors.black),
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CorrectPage())
+                  );
                 },
                 child: const Text(
                   'Register',
@@ -115,6 +119,68 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
+
+class CorrectPage extends StatelessWidget {
+  const CorrectPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Align(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image(
+              height: 200,
+              width: 200,
+              fit: BoxFit.cover,
+              image: AssetImage('assets/images/Successmark.png'),
+            ),
+            SizedBox(height: 35,),
+            Text(
+              'Success!',
+              style: TextStyle(
+                fontSize: 24,
+              ),
+            ),
+            SizedBox(height: 8,),
+            Text(
+              'Your signup has been completed.',
+              style: TextStyle(
+                fontSize: 15,
+                color: Color(0xFF8391A1),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.all(32),
+              width: 226,
+              child: TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.black),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                },
+                child: const Text(
+                  'Sign up',
+                  style: TextStyle(
+                      color: Colors.white
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      )
+    );
+  }
+}
+
 
 class InputSection extends StatelessWidget {
   const InputSection({

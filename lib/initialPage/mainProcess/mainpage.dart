@@ -518,6 +518,68 @@ class PinPage extends StatelessWidget {
   }
 }
 
+class CorrectPage extends StatelessWidget {
+  const CorrectPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Align(
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image(
+                height: 200,
+                width: 200,
+                fit: BoxFit.cover,
+                image: AssetImage('assets/images/Successmark.png'),
+              ),
+              SizedBox(height: 35,),
+              Text(
+                'Success!',
+                style: TextStyle(
+                  fontSize: 24,
+                ),
+              ),
+              SizedBox(height: 8,),
+              Text(
+                'Your feedbacks has been sent.',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF8391A1),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(32),
+                width: 226,
+                child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.black),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MainPage()),
+                    );
+                  },
+                  child: const Text(
+                    'Sign up',
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        )
+    );
+  }
+}
+
+
 class EnterInfoForm extends StatelessWidget {
   const EnterInfoForm({
     required this.textHint,
@@ -584,3 +646,4 @@ class _CheckAgreeState extends State<CheckAgree> {
     );
   }
 }
+
