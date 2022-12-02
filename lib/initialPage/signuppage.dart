@@ -167,7 +167,7 @@ class CorrectPage extends StatelessWidget {
                   );
                 },
                 child: const Text(
-                  'Sign up',
+                  'Back to Login Page',
                   style: TextStyle(
                       color: Colors.white
                   ),
