@@ -163,7 +163,7 @@ class InitialPage extends StatelessWidget {
               onPressed: (){
                 Navigator.pushNamed(
                     context,
-                    '/qr'
+                    '/pin'
                 );
               },
               child: Column(
@@ -311,7 +311,10 @@ class QrPage extends StatelessWidget {
                   backgroundColor: MaterialStateProperty.all(Colors.black),
                 ),
                 onPressed: (){
-                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context)=>InitialPage())
+                  );
                 },
                 child: Text(
                   'Back to main',
@@ -505,7 +508,6 @@ class FeedBackPage extends StatelessWidget {
     );
   }
 }
-
 //Display Pin Enter Page
 class PinPage extends StatelessWidget {
   const PinPage({
@@ -514,7 +516,71 @@ class PinPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Material(
+      child: MyScaffold(
+        body: Padding(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconButton(
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back_ios)
+              ),
+              SizedBox(height: 94,),
+              Padding(
+                padding: EdgeInsets.all(21),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Enter the PIN',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 32
+                      ),
+                    ),
+                    Text(
+                      'I\'ll give you 10 seconds to write it down quickly.',
+                      style: TextStyle(
+                          fontSize: 16
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              EnterInfoForm(textHint: 'Enter your PIN'),
+              SizedBox(height: 22,),
+              Container(
+                padding: EdgeInsets.all(8),
+                width: 331,
+                height: 72,
+                child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.black),
+                  ),
+                  onPressed: (){
+                    Navigator.pushNamed(
+                        context,
+                        '/qr'
+                    );
+                  },
+                  child: Text(
+                    'Send PIN',
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      )
+    );
   }
 }
 
