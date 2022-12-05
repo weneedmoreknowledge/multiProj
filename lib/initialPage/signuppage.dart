@@ -1,5 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import 'loginpage.dart';
+import 'package:untitled/api_connection/api_connection.dart';
+import 'package:untitled/initialPage/model/user.dart';
+
+
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -10,18 +19,76 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
 
-  late TextEditingController _controller;
+  late TextEditingController _controllerName;
+  late TextEditingController _controllerEmail;
+  late TextEditingController _controllerPass;
+  late TextEditingController _controllerConfirm;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
+    _controllerName = TextEditingController();
+    _controllerEmail = TextEditingController();
+    _controllerPass = TextEditingController();
+    _controllerConfirm = TextEditingController();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controllerName.dispose();
+    _controllerEmail.dispose();
+    _controllerPass.dispose();
+    _controllerConfirm.dispose();
     super.dispose();
+  }
+
+  validateUserEmail()async{
+    try{
+      var res = await http.post(
+        Uri.parse(API.validateEmail),
+        body: {
+          'user_email':_controllerEmail.text.trim(),
+        },
+      );
+      if(res.statusCode==200){
+        var resBodyOfValidateEmail=jsonDecode(res.body);
+        if(resBodyOfValidateEmail['emailFound']==true){
+          Fluttertoast.showToast(msg: "Email is already  in someone else use");
+        }
+        else{
+          registerAndSaveUserRecord();
+        }
+      }
+    }catch(e){
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  registerAndSaveUserRecord()async{
+    User userModel=User(
+      1,
+      _controllerName.text.trim(),
+      _controllerEmail.text.trim(),
+      _controllerPass.text.trim()
+    );
+    try{
+     var res = await http.post(
+        Uri.parse(API.signUp),
+        body: userModel.toJson()
+      );
+     if(res.statusCode==200) {
+       var resBodyOfSignup = jsonDecode(res.body);
+       if (resBodyOfSignup['success'] == true) {
+         Fluttertoast.showToast(msg: "Sign up Success");
+       }else{
+         Fluttertoast.showToast(msg: "Error, Try again");
+       }
+     }
+    }catch(e){
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
   }
 
   @override
@@ -56,10 +123,10 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             SizedBox(height: 16,),
-            InputSection(hintText: 'Username'),
-            InputSection(hintText: 'Email'),
-            InputSection(hintText: 'Password'),
-            InputSection(hintText: 'Confirm Password'),
+            InputSection(hintText: 'Username',textEdit: _controllerName,),
+            InputSection(hintText: 'Email',textEdit: _controllerEmail,),
+            InputSection(hintText: 'Password',textEdit: _controllerPass,),
+            InputSection(hintText: 'Confirm Password',textEdit: _controllerConfirm,),
             SizedBox(height: 24,),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 22),
@@ -70,10 +137,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   backgroundColor: MaterialStateProperty.all(Colors.black),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CorrectPage())
-                  );
+                  if(_controllerName!=""&&_controllerEmail.text.contains('@')&&_controllerEmail.text.contains('.')&&_controllerPass!=""&&_controllerConfirm!=""){
+                    validateUserEmail();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const CorrectPage())
+                    );
+                  }
                 },
                 child: const Text(
                   'Register',
@@ -186,8 +256,10 @@ class InputSection extends StatelessWidget {
   const InputSection({
     Key? key,
     required this.hintText,
+    required this.textEdit,
   }) : super(key: key);
   final String hintText;
+  final TextEditingController textEdit;
 
   final Color borderColor = const Color(0xFFF7F8F9);
 
@@ -196,6 +268,7 @@ class InputSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 22,vertical: 6),
       child: TextField(
+        controller: textEdit,
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: borderColor),
