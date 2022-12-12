@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'signuppage.dart';
@@ -15,17 +16,20 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  late TextEditingController _controller;
+  late TextEditingController _controllerEmail;
+  late TextEditingController _controllerPassword;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
+    _controllerEmail = TextEditingController();
+    _controllerPassword = TextEditingController();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controllerEmail.dispose();
+    _controllerPassword.dispose();
     super.dispose();
   }
 
@@ -66,7 +70,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 SizedBox(height: 64,),
-                TextField(
+                TextFormField(
+                  controller: _controllerEmail,
                   decoration: InputDecoration(
                       hintText: "Enter your email",
                       labelText: "Email",
@@ -86,7 +91,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 SizedBox(height: 16,),
-                TextField(
+                TextFormField(
+                  controller: _controllerPassword,
                   decoration: InputDecoration(
                       hintText: 'Enter the Password',
                       labelText: 'Password',
@@ -136,10 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                       backgroundColor: MaterialStateProperty.all(Colors.black),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SignUpPage()),
-                      );
+                      Get.to(()=>SignUpPage());
                     },
                     child: const Text(
                       'Sign up',

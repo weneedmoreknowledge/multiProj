@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import 'loginpage.dart';
 import 'package:untitled/api_connection/api_connection.dart';
 import 'package:untitled/initialPage/model/user.dart';
-
-bool isSignUp=false;
 
 
 class SignUpPage extends StatefulWidget {
@@ -64,7 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
       _controllerPass.text.trim()
     );
     try{
-     var res = await http.post(
+      var res = await http.post(
         Uri.parse(API.signUp),
         body: userModel.toJson()
       );
@@ -72,11 +71,11 @@ class _SignUpPageState extends State<SignUpPage> {
        var resBodyOfSignup = jsonDecode(res.body);
        if (resBodyOfSignup['success'] == true) {
          Fluttertoast.showToast(msg: "Sign up Success");
+         Get.to(()=>CorrectPage());
        }else{
          Fluttertoast.showToast(msg: "Error, Try again");
        }
      }
-     isSignUp = true;
     }catch(e){
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
@@ -142,13 +141,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   onPressed: () async{
                     if(_controllerName.text!=""&&_controllerEmail.text.contains('@')&&_controllerEmail.text.contains('.')&&_controllerPass.text!=""&&_controllerConfirm.text==_controllerPass.text){
                       validateUserEmail();
-                      print(isSignUp);
-                      if(isSignUp){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const CorrectPage())
-                        );
-                      }
                     }
                   },
                   child: const Text(
