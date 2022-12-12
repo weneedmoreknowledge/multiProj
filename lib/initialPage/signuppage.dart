@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:get/get.dart';
 import 'loginpage.dart';
 import 'package:untitled/api_connection/api_connection.dart';
 import 'package:untitled/initialPage/model/user.dart';
 
+bool isSignUp=false;
 
 
 class SignUpPage extends StatefulWidget {
@@ -33,15 +33,6 @@ class _SignUpPageState extends State<SignUpPage> {
     _controllerConfirm = TextEditingController();
   }
 
-  @override
-  void dispose() {
-    _controllerName.dispose();
-    _controllerEmail.dispose();
-    _controllerPass.dispose();
-    _controllerConfirm.dispose();
-    super.dispose();
-  }
-
   validateUserEmail()async{
     try{
       var res = await http.post(
@@ -53,7 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
       if(res.statusCode==200){
         var resBodyOfValidateEmail=jsonDecode(res.body);
         if(resBodyOfValidateEmail['emailFound']==true){
-          Fluttertoast.showToast(msg: "Email is already  in someone else use");
+          Fluttertoast.showToast(msg: "Email is already in someone else use");
         }
         else{
           registerAndSaveUserRecord();
@@ -85,10 +76,21 @@ class _SignUpPageState extends State<SignUpPage> {
          Fluttertoast.showToast(msg: "Error, Try again");
        }
      }
+     isSignUp = true;
     }catch(e){
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controllerName.dispose();
+    _controllerEmail.dispose();
+    _controllerPass.dispose();
+    _controllerConfirm.dispose();
   }
 
   @override
@@ -99,7 +101,7 @@ class _SignUpPageState extends State<SignUpPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          padding: EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Colors.black,
@@ -128,28 +130,33 @@ class _SignUpPageState extends State<SignUpPage> {
             InputSection(hintText: 'Password',textEdit: _controllerPass,),
             InputSection(hintText: 'Confirm Password',textEdit: _controllerConfirm,),
             SizedBox(height: 24,),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 22),
-              width: double.infinity,
-              height: 56,
-              child: TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.black),
-                ),
-                onPressed: () {
-                  if(_controllerName!=""&&_controllerEmail.text.contains('@')&&_controllerEmail.text.contains('.')&&_controllerPass!=""&&_controllerConfirm!=""){
-                    validateUserEmail();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const CorrectPage())
-                    );
-                  }
-                },
-                child: const Text(
-                  'Register',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15
+            Material(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 22),
+                width: double.infinity,
+                height: 56,
+                child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.black),
+                  ),
+                  onPressed: () async{
+                    if(_controllerName.text!=""&&_controllerEmail.text.contains('@')&&_controllerEmail.text.contains('.')&&_controllerPass.text!=""&&_controllerConfirm.text==_controllerPass.text){
+                      validateUserEmail();
+                      print(isSignUp);
+                      if(isSignUp){
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const CorrectPage())
+                        );
+                      }
+                    }
+                  },
+                  child: const Text(
+                    'Register',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15
+                    ),
                   ),
                 ),
               ),
@@ -266,8 +273,9 @@ class InputSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 22,vertical: 6),
-      child: TextField(
+      padding: const EdgeInsets.symmetric(horizontal: 22,vertical: 6),
+      child: TextFormField(
+        validator: (val)=>val==""?"Please fill out":null,
         controller: textEdit,
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
@@ -280,7 +288,7 @@ class InputSection extends StatelessWidget {
           ),
           hintText: hintText,
           hintStyle: const TextStyle(color: Color(0xFF8391A1)),
-          contentPadding: EdgeInsets.symmetric(horizontal: 18,vertical: 18),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 18,vertical: 18),
           fillColor:borderColor,
           filled: true,
         ),
