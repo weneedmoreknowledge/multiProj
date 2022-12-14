@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
+import 'package:mysql1/mysql1.dart';
+
 import 'loginpage.dart';
 import 'package:untitled/api_connection/api_connection.dart';
 import 'package:untitled/initialPage/model/user.dart';
@@ -24,7 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _controllerConfirm;
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
     _controllerName = TextEditingController();
     _controllerEmail = TextEditingController();
@@ -34,6 +36,34 @@ class _SignUpPageState extends State<SignUpPage> {
 
   validateUserEmail()async{
     try{
+      bool isAble = true;
+      final conn = await MySqlConnection.connect(ConnectionSettings(
+          host: 'localhost',
+          port: 80,
+          user: 'root',
+          db: 'qr_app',
+          password: ''
+      ));
+      final String emailInput=_controllerEmail.text.trim();
+      print(emailInput);
+      // Query the database using a parameterized query
+      var results = await conn.query(
+          'SELECT user_email FROM `usr_table`'
+      );
+      for (var row in results) {
+        print('Email: ${row}');
+        if(row==emailInput){
+          isAble=false;
+        }
+      }
+      if(isAble){
+        registerAndSaveUserRecord();
+      }else{
+        print('There is a same email');
+      }
+      await conn.close();
+      // old one
+      /*
       var res = await http.post(
         Uri.parse(API.validateEmail),
         body: {
@@ -49,6 +79,7 @@ class _SignUpPageState extends State<SignUpPage> {
           registerAndSaveUserRecord();
         }
       }
+       */
     }catch(e){
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
@@ -63,6 +94,32 @@ class _SignUpPageState extends State<SignUpPage> {
       _controllerPass.text.trim()
     );
     try{
+      bool isAble = true;
+      final conn = await MySqlConnection.connect(ConnectionSettings(
+          host: 'localhost',
+          port: 80,
+          user: 'root',
+          db: 'qr_app',
+          password: ''
+      ));
+      print(userModel.user_id);
+      print(userModel.user_name);
+      print(userModel.user_email);
+      print(userModel.user_password);
+      var result = await conn.query(
+          'INSERT INTO usr_table(user_id,user_name,user_email,user_password) values (?, ?, ?, ?)`',
+          [userModel.user_id,userModel.user_name,userModel.user_email,userModel.user_password]
+      );
+      print('Inserted row id=${result.insertId}');
+      var results = await conn.query(
+          'select name, email, age from users where id = ?', [result.insertId]);
+      for (var row in results) {
+        print('Name: ${row[1]}, email: ${row[2]}');
+      }
+      await conn.close();
+      Get.to(()=>const CorrectPage());
+      // old one
+      /*
       var res = await http.post(
         Uri.parse(API.signUp),
         body: userModel.toJson()
@@ -76,6 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
          Fluttertoast.showToast(msg: "Error, Try again");
        }
      }
+       */
     }catch(e){
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
