@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -34,9 +35,11 @@ class _SignUpPageState extends State<SignUpPage> {
     _controllerConfirm = TextEditingController();
   }
 
-  validateUserEmail()async{
+  Future validateUserEmail()async{
+    bool isAble = true;
     try{
-      bool isAble = true;
+      // old one
+      /*
       final conn = await MySqlConnection.connect(ConnectionSettings(
           host: 'localhost',
           port: 80,
@@ -44,12 +47,13 @@ class _SignUpPageState extends State<SignUpPage> {
           db: 'qr_app',
           password: ''
       ));
-      final String emailInput=_controllerEmail.text.trim();
-      print(emailInput);
       // Query the database using a parameterized query
       var results = await conn.query(
           'SELECT user_email FROM `usr_table`'
       );
+      sleep(Duration(seconds:1));
+      final String emailInput=_controllerEmail.text.trim();
+      print(emailInput);
       for (var row in results) {
         print('Email: ${row}');
         if(row==emailInput){
@@ -57,36 +61,35 @@ class _SignUpPageState extends State<SignUpPage> {
         }
       }
       if(isAble){
+        print(isAble);
         registerAndSaveUserRecord();
       }else{
         print('There is a same email');
       }
       await conn.close();
-      // old one
-      /*
+     */
       var res = await http.post(
         Uri.parse(API.validateEmail),
         body: {
           'user_email':_controllerEmail.text.trim(),
         },
       );
-      if(res.statusCode==200){
-        var resBodyOfValidateEmail=jsonDecode(res.body);
-        if(resBodyOfValidateEmail['emailFound']==true){
+      if(res.statusCode==200) {
+        var resBodyOfValidateEmail = jsonDecode(res.body);
+        if (resBodyOfValidateEmail['emailFound'] == true) {
           Fluttertoast.showToast(msg: "Email is already in someone else use");
         }
-        else{
+        else {
           registerAndSaveUserRecord();
         }
       }
-       */
     }catch(e){
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
     }
   }
 
-  registerAndSaveUserRecord()async{
+  Future registerAndSaveUserRecord()async{
     User userModel=User(
       1,
       _controllerName.text.trim(),
@@ -94,6 +97,8 @@ class _SignUpPageState extends State<SignUpPage> {
       _controllerPass.text.trim()
     );
     try{
+      // old one
+      /*
       bool isAble = true;
       final conn = await MySqlConnection.connect(ConnectionSettings(
           host: 'localhost',
@@ -118,22 +123,23 @@ class _SignUpPageState extends State<SignUpPage> {
       }
       await conn.close();
       Get.to(()=>const CorrectPage());
-      // old one
-      /*
+       */
+      sleep(Duration(seconds:1));
       var res = await http.post(
         Uri.parse(API.signUp),
-        body: userModel.toJson()
+        body: userModel.toJson(),
       );
-     if(res.statusCode==200) {
-       var resBodyOfSignup = jsonDecode(res.body);
-       if (resBodyOfSignup['success'] == true) {
-         Fluttertoast.showToast(msg: "Sign up Success");
-         Get.to(()=>CorrectPage());
-       }else{
-         Fluttertoast.showToast(msg: "Error, Try again");
-       }
+      sleep(Duration(seconds:1));
+      if(res.statusCode==200) {
+        var resBodyOfSignup = jsonDecode(res.body);
+        if (resBodyOfSignup['success'] == true) {
+          Fluttertoast.showToast(msg: "Sign up Success");
+          sleep(Duration(seconds:1));
+          Get.to(()=>CorrectPage());
+        }else{
+          Fluttertoast.showToast(msg: "Error, Try again");
+        }
      }
-       */
     }catch(e){
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
@@ -182,7 +188,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             SizedBox(height: 16,),
-            InputSection(hintText: 'Username',textEdit: _controllerName,),
+            InputSection(hintText: 'Full name',textEdit: _controllerName,),
             InputSection(hintText: 'Email',textEdit: _controllerEmail,),
             InputSection(hintText: 'Password',textEdit: _controllerPass,),
             InputSection(hintText: 'Confirm Password',textEdit: _controllerConfirm,),
@@ -199,6 +205,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   onPressed: () async{
                     if(_controllerName.text!=""&&_controllerEmail.text.contains('@')&&_controllerEmail.text.contains('.')&&_controllerPass.text!=""&&_controllerConfirm.text==_controllerPass.text){
                       validateUserEmail();
+                      //Get.to(CorrectPage());
                     }
                   },
                   child: const Text(
