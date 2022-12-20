@@ -35,7 +35,6 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future validateUserEmail()async{
-    bool isAble = true;
     try{
       var res = await http.post(
         Uri.parse(API.validateEmail),
