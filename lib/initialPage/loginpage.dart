@@ -4,8 +4,14 @@ import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'signuppage.dart';
 import 'mainProcess/mainpage.dart';
+import 'package:untitled/api_connection/api_connection.dart';
+import 'package:untitled/initialPage/model/user.dart';
+import 'package:untitled/initialPage/model/user_preference.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -24,6 +30,33 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     _controllerEmail = TextEditingController();
     _controllerPassword = TextEditingController();
+  }
+
+  loginUserNow()async{
+    try{
+      var res = await http.post(
+        Uri.parse(API.login),
+        body: {
+          'user_email':_controllerEmail.text.trim(),
+          'user_password':_controllerPassword.text.trim(),
+        },
+      );
+      if(res.statusCode==200){
+        var resBodyOfLogin=jsonDecode(res.body);
+        if(resBodyOfLogin['success']==true){
+          Fluttertoast.showToast(msg: 'Login Success');
+          User userInfo = User.fromJson(resBodyOfLogin['userData']);
+          //save user data to local storage
+          await RememberUserPrefs.saveRemeberUser(userInfo);
+          Get.to(()=>const MainPage());
+        }else{
+          Fluttertoast.showToast(msg: 'Wrong information. Try again');
+        }
+      }
+    }catch(e){
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
   }
 
   @override
@@ -120,10 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                       backgroundColor: MaterialStateProperty.all(Colors.orange),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const MainPage()),
-                      );
+                      loginUserNow();
                     },
                     child: const Text(
                       'Login',

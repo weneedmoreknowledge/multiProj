@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
-import 'package:mysql1/mysql1.dart';
 
 import 'loginpage.dart';
 import 'package:untitled/api_connection/api_connection.dart';
@@ -38,36 +37,6 @@ class _SignUpPageState extends State<SignUpPage> {
   Future validateUserEmail()async{
     bool isAble = true;
     try{
-      // old one
-      /*
-      final conn = await MySqlConnection.connect(ConnectionSettings(
-          host: 'localhost',
-          port: 80,
-          user: 'root',
-          db: 'qr_app',
-          password: ''
-      ));
-      // Query the database using a parameterized query
-      var results = await conn.query(
-          'SELECT user_email FROM `usr_table`'
-      );
-      sleep(Duration(seconds:1));
-      final String emailInput=_controllerEmail.text.trim();
-      print(emailInput);
-      for (var row in results) {
-        print('Email: ${row}');
-        if(row==emailInput){
-          isAble=false;
-        }
-      }
-      if(isAble){
-        print(isAble);
-        registerAndSaveUserRecord();
-      }else{
-        print('There is a same email');
-      }
-      await conn.close();
-     */
       var res = await http.post(
         Uri.parse(API.validateEmail),
         body: {
@@ -97,44 +66,15 @@ class _SignUpPageState extends State<SignUpPage> {
       _controllerPass.text.trim()
     );
     try{
-      // old one
-      /*
-      bool isAble = true;
-      final conn = await MySqlConnection.connect(ConnectionSettings(
-          host: 'localhost',
-          port: 80,
-          user: 'root',
-          db: 'qr_app',
-          password: ''
-      ));
-      print(userModel.user_id);
-      print(userModel.user_name);
-      print(userModel.user_email);
-      print(userModel.user_password);
-      var result = await conn.query(
-          'INSERT INTO usr_table(user_id,user_name,user_email,user_password) values (?, ?, ?, ?)`',
-          [userModel.user_id,userModel.user_name,userModel.user_email,userModel.user_password]
-      );
-      print('Inserted row id=${result.insertId}');
-      var results = await conn.query(
-          'select name, email, age from users where id = ?', [result.insertId]);
-      for (var row in results) {
-        print('Name: ${row[1]}, email: ${row[2]}');
-      }
-      await conn.close();
-      Get.to(()=>const CorrectPage());
-       */
       sleep(Duration(seconds:1));
       var res = await http.post(
         Uri.parse(API.signUp),
         body: userModel.toJson(),
       );
-      sleep(Duration(seconds:1));
       if(res.statusCode==200) {
         var resBodyOfSignup = jsonDecode(res.body);
         if (resBodyOfSignup['success'] == true) {
           Fluttertoast.showToast(msg: "Sign up Success");
-          sleep(Duration(seconds:1));
           Get.to(()=>CorrectPage());
         }else{
           Fluttertoast.showToast(msg: "Error, Try again");
