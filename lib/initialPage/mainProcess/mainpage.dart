@@ -4,7 +4,9 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 bool isChecked = false;
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({
+    Key? key
+  }) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();

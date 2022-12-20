@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
           Fluttertoast.showToast(msg: 'Login Success');
           User userInfo = User.fromJson(resBodyOfLogin['userData']);
           //save user data to local storage
-          await RememberUserPrefs.saveRemeberUser(userInfo);
+          await RememberUserPrefs.saveRememberUser(userInfo);
           Get.to(()=>const MainPage());
         }else{
           Fluttertoast.showToast(msg: 'Wrong information. Try again');
