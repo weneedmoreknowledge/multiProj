@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:get/get.dart';
+import 'package:untitled/initialPage/model/current_user.dart';
+
+import 'package:untitled/initialPage/model/user_preference.dart';
 
 bool isChecked = false;
 
@@ -13,6 +17,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,56 +37,67 @@ class MyScaffold extends StatelessWidget {
   MyScaffold({required this.body});
   final Widget body;
 
+  final CurrentUser _rememberCurrentUser=Get.put(CurrentUser());
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Don't show the leading button
-        toolbarHeight: 130,
-        backgroundColor:Color(0xFF2A2A37),
-        centerTitle: false,
-        actions: [
-          CircleAvatar(
-            radius: 43,
-            backgroundImage:AssetImage('assets/images/profile.png'),
-          ),
-          SizedBox(width: 16,)
-        ],
-        title: Container(
-          //padding: EdgeInsets.symmetric(horizontal: 16),
-          width: double.infinity,
-          child: Row(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Name',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
+    return GetBuilder(
+        init: CurrentUser(),
+        initState:(currentState){
+          _rememberCurrentUser.getUserInfo();
+        },
+        builder: (controller){
+          return Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false, // Don't show the leading button
+              toolbarHeight: 130,
+              backgroundColor:Color(0xFF2A2A37),
+              centerTitle: false,
+              actions: [
+                CircleAvatar(
+                  radius: 43,
+                  backgroundImage:AssetImage('assets/images/profile.png'),
+                ),
+                SizedBox(width: 16,)
+              ],
+              title: Container(
+                //padding: EdgeInsets.symmetric(horizontal: 16),
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _rememberCurrentUser.user.user_name,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                          ),
+                        ),
+                        SizedBox(height: 4,),
+                        Text(
+                          'Member',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 4,),
-                  Text(
-                    'Member',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-      backgroundColor: Colors.white,
-      body: this.body,
-    );
+            ),
+            backgroundColor: Colors.white,
+            body: this.body,
+          );
+        }
+        );
   }
 }
-// the first page
+
+// the First page
 class InitialPage extends StatelessWidget {
   const InitialPage({
     Key? key
@@ -283,6 +299,7 @@ class InitialPage extends StatelessWidget {
     );
   }
 }
+
 //Display Qr Page
 class QrPage extends StatelessWidget {
   const QrPage({
@@ -332,6 +349,7 @@ class QrPage extends StatelessWidget {
     );
   }
 }
+
 //Display User History Page
 class HistoryPage extends StatelessWidget {
   const HistoryPage({
@@ -381,6 +399,7 @@ class HistoryPage extends StatelessWidget {
     );
   }
 }
+
 //User Feedback Page
 class FeedBackPage extends StatelessWidget {
   const FeedBackPage({
@@ -510,6 +529,7 @@ class FeedBackPage extends StatelessWidget {
     );
   }
 }
+
 //Display Pin Enter Page
 class PinPage extends StatelessWidget {
   const PinPage({
@@ -586,6 +606,7 @@ class PinPage extends StatelessWidget {
   }
 }
 
+//Display Correct Page
 class CorrectPage extends StatelessWidget {
   const CorrectPage({Key? key}) : super(key: key);
 
