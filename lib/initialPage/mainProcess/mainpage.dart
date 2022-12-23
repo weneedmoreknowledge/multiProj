@@ -1,11 +1,80 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:untitled/initialPage/model/current_user.dart';
 
-import 'package:untitled/initialPage/model/user_preference.dart';
 
 bool isChecked = false;
+final CurrentUser _rememberCurrentUser=Get.put(CurrentUser());
+
+class Loading extends StatelessWidget {
+  Loading({Key? key}) : super(key: key);
+
+  final Future<String> _calculation = Future<String>.delayed(
+    const Duration(seconds: 2),
+      ()=>'Complete',
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder(
+        init: CurrentUser(),
+        initState:(currentState){
+          _rememberCurrentUser.getUserInfo();
+          },
+        builder: (controller){
+          return DefaultTextStyle(
+            style: Theme.of(context).textTheme.displayMedium!,
+            textAlign: TextAlign.center,
+            child: FutureBuilder<String>(
+              future: _calculation, // a previously-obtained Future<String> or null
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                List<Widget> children;
+                if (snapshot.hasData) {
+                  children = const <Widget>[
+                    SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text('Awaiting result...'),
+                    ),
+                  ];
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context)=>MainPage())
+                  );
+                } else {
+                  children = const <Widget>[
+                    SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text('Awaiting result...'),
+                    ),
+                  ];
+                }
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: children,
+                  ),
+                );
+              },
+            ),
+          );
+        }
+    );
+  }
+}
+
 
 class MainPage extends StatefulWidget {
   const MainPage({
@@ -22,22 +91,20 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: InitialPage(),
+      home: const InitialPage(),
       routes: {
-        '/qr': (ctx) => QrPage(),
-        '/his':(ctx)=> HistoryPage(),
-        '/feed':(ctx)=> FeedBackPage(),
-        '/pin': (ctx) => PinPage(),
+        '/qr': (ctx) => const QrPage(),
+        '/his':(ctx)=> const HistoryPage(),
+        '/feed':(ctx)=> const FeedBackPage(),
+        '/pin': (ctx) => const PinPage(),
       },
     );
   }
 }
 
 class MyScaffold extends StatelessWidget {
-  MyScaffold({required this.body});
+  MyScaffold({Key? key, required this.body}) : super(key: key);
   final Widget body;
-
-  final CurrentUser _rememberCurrentUser=Get.put(CurrentUser());
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +157,7 @@ class MyScaffold extends StatelessWidget {
               ),
             ),
             backgroundColor: Colors.white,
-            body: this.body,
+            body: body,
           );
         }
         );
