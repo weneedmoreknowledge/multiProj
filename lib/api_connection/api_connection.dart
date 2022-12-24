@@ -1,5 +1,5 @@
 class API{
-  static const hostConnect='http://localhost/api_qrscan';
+  static const hostConnect='http://192.168.40.103/api_qrscan';
   static const hostConnectUser='$hostConnect/user';
 
   //Sign up user

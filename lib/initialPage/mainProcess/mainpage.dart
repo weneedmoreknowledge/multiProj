@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
 import 'package:untitled/initialPage/model/current_user.dart';
 
 
@@ -13,7 +15,7 @@ class Loading extends StatelessWidget {
   Loading({Key? key}) : super(key: key);
 
   final Future<String> _calculation = Future<String>.delayed(
-    const Duration(seconds: 2),
+    const Duration(seconds: 1),
       ()=>'Complete',
   );
 
@@ -44,10 +46,7 @@ class Loading extends StatelessWidget {
                       child: Text('Awaiting result...'),
                     ),
                   ];
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context)=>MainPage())
-                  );
+                  Get.to(MainPage());
                 } else {
                   children = const <Widget>[
                     SizedBox(
@@ -383,11 +382,10 @@ class QrPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image(
-              fit: BoxFit.contain,
-              height: 332,
-              width: double.infinity,
-              image: AssetImage('assets/images/qricon.png'),
+            QrImage(
+              data: _rememberCurrentUser.user.user_email,
+              version: QrVersions.auto,
+              size: 240.0,
             ),
             Container(
               margin: EdgeInsets.only(top: 16),
