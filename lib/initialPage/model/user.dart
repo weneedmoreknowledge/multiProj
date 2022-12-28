@@ -25,3 +25,35 @@ class User{
     'user_password':user_password,
   };
 }
+
+class FeedBack{
+  int id;
+  String user_name;
+  String user_email;
+  String phone_number;
+  String feed_contents;
+
+  FeedBack(
+      this.id,
+      this.user_name,
+      this.user_email,
+      this.phone_number,
+      this.feed_contents
+      );
+
+  factory FeedBack.fromJson(Map<String,dynamic>json)=>FeedBack(
+    int.parse(json["id"]),
+    json["user_name"],
+    json["user_email"],
+    json["user_phone"],
+    json["feed_contents"],
+  );
+
+  Map<String,dynamic> toJson()=>{
+    'id':id.toString(),
+    'user_name':user_name,
+    'user_email':user_email,
+    'user_phone':phone_number,
+    'feed_contents':feed_contents
+  };
+}

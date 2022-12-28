@@ -1,11 +1,20 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:untitled/initialPage/loginpage.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:untitled/initialPage/model/current_user.dart';
+import 'package:untitled/initialPage/model/user.dart';
+import 'package:untitled/initialPage/signuppage.dart';
+
+import '../../api_connection/api_connection.dart';
+
 
 
 bool isChecked = false;
@@ -200,7 +209,7 @@ class InitialPage extends StatelessWidget {
                 shadowColor: MaterialStateProperty.all(Colors.transparent),
               ),
               onPressed: (){
-                Navigator.pop(context);
+                Get.to(LoginPage());
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -465,11 +474,61 @@ class HistoryPage extends StatelessWidget {
   }
 }
 
-//User Feedback Page
-class FeedBackPage extends StatelessWidget {
-  const FeedBackPage({
-    Key? key
-  }) : super(key: key);
+class FeedBackPage extends StatefulWidget {
+  const FeedBackPage({Key? key}) : super(key: key);
+
+  @override
+  State<FeedBackPage> createState() => _FeedBackPageState();
+}
+
+class _FeedBackPageState extends State<FeedBackPage> {
+  late TextEditingController _nameControl;
+  late TextEditingController _emailControl;
+  late TextEditingController _phoneControl;
+  late TextEditingController _feedControl;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _nameControl=TextEditingController();
+    _emailControl=TextEditingController();
+    _phoneControl=TextEditingController();
+    _feedControl=TextEditingController();
+    super.initState();
+  }
+
+  Future submitFeedback()async{
+    FeedBack userModel = FeedBack(
+      1,
+      _nameControl.text.trim(),
+      _emailControl.text.trim(),
+      _phoneControl.text.trim(),
+      _feedControl.text.trim(),
+    );
+    try{
+      var res = await http.post(
+        Uri.parse(API.feedback),
+        body: userModel.toJson(),
+      );
+      if(res.statusCode==200) {
+        var resBodyOfSignup = jsonDecode(res.body);
+        if (resBodyOfSignup['success'] == true) {
+          Fluttertoast.showToast(msg: "Feedback submitted");
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CorrectPage()),
+            );
+          });
+        }else{
+          Fluttertoast.showToast(msg: "Error, Try again");
+        }
+      }
+    }catch(e){
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -505,9 +564,9 @@ class FeedBackPage extends StatelessWidget {
                 shrinkWrap: true,
                 childAspectRatio: 2.5,
                 children: [
-                  EnterInfoForm(textHint: 'UserName'),
-                  EnterInfoForm(textHint: 'Email Address'),
-                  EnterInfoForm(textHint: 'Phone Number'),
+                  EnterInfoForm(textHint: 'UserName',controller: _nameControl,),
+                  EnterInfoForm(textHint: 'Email Address',controller: _emailControl,),
+                  EnterInfoForm(textHint: 'Phone Number',controller: _phoneControl,),
                 ],
               ),
               Container(
@@ -539,6 +598,7 @@ class FeedBackPage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8),
                 child: TextFormField(
+                  controller: _feedControl,
                   maxLines: 7,
                   minLines: 7,
                   decoration: InputDecoration(
@@ -576,7 +636,10 @@ class FeedBackPage extends StatelessWidget {
                       backgroundColor: MaterialStateProperty.all(Colors.black),
                     ),
                     onPressed: () {
-                      Navigator.pop(context);
+                      if(isChecked&&_nameControl.text!=null&&_emailControl.text!=null&&_phoneControl.text!=null&&_feedControl.text!=null){
+                        submitFeedback();
+                      }
+                      //Navigator.pop(context);
                     },
                     child: const Text(
                       'Submit',
@@ -594,12 +657,21 @@ class FeedBackPage extends StatelessWidget {
     );
   }
 }
+class PinPage extends StatefulWidget {
+  const PinPage({Key? key}) : super(key: key);
 
-//Display Pin Enter Page
-class PinPage extends StatelessWidget {
-  const PinPage({
-    Key? key
-  }) : super(key: key);
+  @override
+  State<PinPage> createState() => _PinPageState();
+}
+
+class _PinPageState extends State<PinPage> {
+  late TextEditingController _pinControl;
+  @override
+  void initState() {
+    // TODO: implement initState
+    _pinControl=TextEditingController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -639,7 +711,7 @@ class PinPage extends StatelessWidget {
                   ],
                 ),
               ),
-              EnterInfoForm(textHint: 'Enter your PIN'),
+              EnterInfoForm(textHint: 'Enter your PIN',controller: _pinControl,),
               SizedBox(height: 22,),
               Container(
                 padding: EdgeInsets.all(8),
@@ -737,15 +809,18 @@ class CorrectPage extends StatelessWidget {
 class EnterInfoForm extends StatelessWidget {
   const EnterInfoForm({
     required this.textHint,
+    required this.controller,
     Key? key
   }) : super(key: key);
   final String textHint;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(8),
       child: TextFormField(
+        controller: controller,
         decoration: InputDecoration(
           labelText: textHint,
           fillColor: Colors.white,
