@@ -57,3 +57,23 @@ class FeedBack{
     'feed_contents':feed_contents
   };
 }
+
+class History{
+  String user_email;
+  String checkDate;
+
+  History(
+      this.user_email,
+      this.checkDate
+      );
+
+  factory History.fromJson(Map<String,dynamic>json)=>History(
+    json["user_email"],
+    json["check_date"],
+  );
+
+  Map<String,dynamic> toJson()=>{
+    'user_email':user_email,
+    'check_date':checkDate,
+  };
+}

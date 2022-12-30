@@ -7,5 +7,6 @@ class API{
   static const signUp = '$hostConnectUser/signup.php';
   static const login = '$hostConnectUser/login.php';
   static const feedback = '$hostConnectUser/feedback.php';
+  static const history = '$hostConnectUser/history.php';
 
 }

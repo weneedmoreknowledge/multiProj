@@ -482,16 +482,12 @@ class FeedBackPage extends StatefulWidget {
 }
 
 class _FeedBackPageState extends State<FeedBackPage> {
-  late TextEditingController _nameControl;
-  late TextEditingController _emailControl;
   late TextEditingController _phoneControl;
   late TextEditingController _feedControl;
 
   @override
   void initState() {
     // TODO: implement initState
-    _nameControl=TextEditingController();
-    _emailControl=TextEditingController();
     _phoneControl=TextEditingController();
     _feedControl=TextEditingController();
     super.initState();
@@ -500,8 +496,8 @@ class _FeedBackPageState extends State<FeedBackPage> {
   Future submitFeedback()async{
     FeedBack userModel = FeedBack(
       1,
-      _nameControl.text.trim(),
-      _emailControl.text.trim(),
+      _rememberCurrentUser.user.user_name,
+      _rememberCurrentUser.user.user_email,
       _phoneControl.text.trim(),
       _feedControl.text.trim(),
     );
@@ -565,8 +561,6 @@ class _FeedBackPageState extends State<FeedBackPage> {
                 shrinkWrap: true,
                 childAspectRatio: 2.5,
                 children: [
-                  EnterInfoForm(textHint: 'UserName',controller: _nameControl,),
-                  EnterInfoForm(textHint: 'Email Address',controller: _emailControl,),
                   EnterInfoForm(textHint: 'Phone Number',controller: _phoneControl,),
                 ],
               ),
@@ -637,7 +631,7 @@ class _FeedBackPageState extends State<FeedBackPage> {
                       backgroundColor: MaterialStateProperty.all(Colors.black),
                     ),
                     onPressed: () {
-                      if(isChecked&&_nameControl.text!=null&&_emailControl.text!=null&&_phoneControl.text!=null&&_feedControl.text!=null){
+                      if(isChecked&&_phoneControl.text!=null&&_feedControl.text!=null){
                         submitFeedback();
                       }
                       //Navigator.pop(context);
