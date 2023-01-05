@@ -24,6 +24,10 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _controllerEmail;
   late TextEditingController _controllerPass;
   late TextEditingController _controllerConfirm;
+  late TextEditingController _controllerGender;
+  late TextEditingController _controllerDOB;
+  late TextEditingController _controllerPIN;
+
 
   @override
   void initState(){
@@ -32,6 +36,9 @@ class _SignUpPageState extends State<SignUpPage> {
     _controllerEmail = TextEditingController();
     _controllerPass = TextEditingController();
     _controllerConfirm = TextEditingController();
+    _controllerGender = TextEditingController();
+    _controllerDOB = TextEditingController();
+    _controllerPIN = TextEditingController();
   }
 
   Future validateUserEmail()async{
@@ -58,18 +65,22 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future registerAndSaveUserRecord()async{
+    
     User userModel=User(
       1,
       _controllerName.text.trim(),
       _controllerEmail.text.trim(),
-      _controllerPass.text.trim()
+      _controllerPass.text.trim(),
+      _controllerGender.text.trim(),
+      DateTime.parse(_controllerDOB.text),
+      _controllerPIN.text.trim(),
     );
     try{
-      sleep(Duration(seconds:1));
       var res = await http.post(
         Uri.parse(API.signUp),
         body: userModel.toJson(),
       );
+      sleep(Duration(seconds:1));
       if(res.statusCode==200) {
         var resBodyOfSignup = jsonDecode(res.body);
         if (resBodyOfSignup['success'] == true) {
@@ -93,6 +104,9 @@ class _SignUpPageState extends State<SignUpPage> {
     _controllerEmail.dispose();
     _controllerPass.dispose();
     _controllerConfirm.dispose();
+    _controllerPIN.dispose();
+    _controllerDOB.dispose();
+    _controllerGender.dispose();
   }
 
   @override
@@ -131,6 +145,9 @@ class _SignUpPageState extends State<SignUpPage> {
             InputSection(hintText: 'Email',textEdit: _controllerEmail,),
             InputSection(hintText: 'Password',textEdit: _controllerPass,),
             InputSection(hintText: 'Confirm Password',textEdit: _controllerConfirm,),
+            InputSection(hintText: 'Gender',textEdit: _controllerGender,),
+            InputSection(hintText: 'Date of Birth',textEdit: _controllerDOB,),
+            InputSection(hintText: 'PIN (4 words)',textEdit: _controllerPIN,),
             SizedBox(height: 24,),
             Material(
               child: Container(
@@ -142,9 +159,26 @@ class _SignUpPageState extends State<SignUpPage> {
                     backgroundColor: MaterialStateProperty.all(Colors.black),
                   ),
                   onPressed: () async{
-                    if(_controllerName.text!=""&&_controllerEmail.text.contains('@')&&_controllerEmail.text.contains('.')&&_controllerPass.text!=""&&_controllerConfirm.text==_controllerPass.text){
+                    if(_controllerName.text.isEmpty){
+                      Fluttertoast.showToast(msg: "INPUT the full name");
+                    }else if(_controllerEmail.text.isEmpty){
+                      Fluttertoast.showToast(msg: "INPUT the email address");
+                    }else if(!_controllerEmail.text.contains('@')&&!_controllerEmail.text.contains('.')){
+                      Fluttertoast.showToast(msg: "INPUT the correct format of email address");
+                    }else if(_controllerPass.text.isEmpty){
+                      Fluttertoast.showToast(msg: "INPUT the Password");
+                    }else if(_controllerConfirm.text != _controllerPass.text){
+                      Fluttertoast.showToast(msg: "Check the confirm that is same");
+                    }else if(_controllerGender.text.isEmpty){
+                      Fluttertoast.showToast(msg: "INPUT the Gender");
+                    }else if(_controllerDOB.text.isEmpty){
+                      Fluttertoast.showToast(msg: "INPUT the Date of Birthday");
+                    }else if(_controllerPIN.text.isEmpty){
+                      Fluttertoast.showToast(msg: "INPUT the PIN");
+                    }else if(_controllerPIN.text.length!=4){
+                      Fluttertoast.showToast(msg: "PIN code is just only 4 letters.\nPlease Enter correctly.");
+                    }else{
                       validateUserEmail();
-                      //Get.to(CorrectPage());
                     }
                   },
                   child: const Text(

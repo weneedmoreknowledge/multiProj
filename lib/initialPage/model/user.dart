@@ -3,57 +3,65 @@ class User{
   String user_name;
   String user_email;
   String user_password;
+  String user_gender;
+  DateTime user_DOB;
+  String user_PIN;
 
   User(
       this.user_id,
       this.user_name,
       this.user_email,
-      this.user_password
+      this.user_password,
+      this.user_gender,
+      this.user_DOB,
+      this.user_PIN,
   );
 
   factory User.fromJson(Map<String,dynamic>json)=>User(
-      int.parse(json["user_id"]),
-      json["user_name"],
-      json["user_email"],
-      json["user_password"],
+    int.parse(json["user_id"]),
+    json["user_name"],
+    json["mail"],
+    json["pass"],
+    json["gender"],
+    DateTime.parse(json["DOB"]),
+    json["PIN"],
   );
 
   Map<String,dynamic> toJson()=>{
     'user_id':user_id.toString(),
     'user_name':user_name,
-    'user_email':user_email,
-    'user_password':user_password,
+    'mail':user_email,
+    'pass':user_password,
+    'gender':user_gender,
+    'DOB':user_DOB.toString(),
+    'PIN':user_PIN,
   };
 }
 
 class FeedBack{
   int id;
-  String user_name;
-  String user_email;
-  String phone_number;
+  int user_id;
+  String title;
   String feed_contents;
 
   FeedBack(
       this.id,
-      this.user_name,
-      this.user_email,
-      this.phone_number,
+      this.user_id,
+      this.title,
       this.feed_contents
       );
 
   factory FeedBack.fromJson(Map<String,dynamic>json)=>FeedBack(
-    int.parse(json["id"]),
-    json["user_name"],
-    json["user_email"],
-    json["user_phone"],
+    int.parse(json["report_id"]),
+    int.parse(json["user_id"]),
+    json["title"],
     json["feed_contents"],
   );
 
   Map<String,dynamic> toJson()=>{
-    'id':id.toString(),
-    'user_name':user_name,
-    'user_email':user_email,
-    'user_phone':phone_number,
+    'report_id':id.toString(),
+    'user_id':user_id.toString(),
+    'title':title,
     'feed_contents':feed_contents
   };
 }

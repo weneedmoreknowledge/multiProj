@@ -1,23 +1,22 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:untitled/initialPage/loginpage.dart';
 import 'package:http/http.dart' as http;
+import 'package:mysql1/mysql1.dart';
 
+import 'package:untitled/initialPage/loginpage.dart';
 import 'package:untitled/initialPage/model/current_user.dart';
 import 'package:untitled/initialPage/model/user.dart';
-import 'package:untitled/initialPage/signuppage.dart';
 
 import '../../api_connection/api_connection.dart';
 
 
 
-bool isChecked = false;
+bool isFeedChecked = false;
+bool isUpdateChecked = false;
 final CurrentUser _rememberCurrentUser=Get.put(CurrentUser());
 
 class Loading extends StatelessWidget {
@@ -101,9 +100,10 @@ class _MainPageState extends State<MainPage> {
       debugShowCheckedModeBanner: false,
       home: const InitialPage(),
       routes: {
+        '/pro':(ctx) => const ProfilePage(),
         '/qr': (ctx) => const QrPage(),
-        '/his':(ctx)=> const HistoryPage(),
-        '/feed':(ctx)=> const FeedBackPage(),
+        '/his':(ctx) => const HistoryPage(),
+        '/feed':(ctx) => const FeedBackPage(),
         '/pin': (ctx) => const PinPage(),
       },
     );
@@ -209,7 +209,10 @@ class InitialPage extends StatelessWidget {
                 shadowColor: MaterialStateProperty.all(Colors.transparent),
               ),
               onPressed: (){
-                Get.to(LoginPage());
+                Navigator.pushNamed(
+                    context,
+                    '/pro'
+                );
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -482,24 +485,23 @@ class FeedBackPage extends StatefulWidget {
 }
 
 class _FeedBackPageState extends State<FeedBackPage> {
-  late TextEditingController _phoneControl;
-  late TextEditingController _feedControl;
+  late TextEditingController _titleControl;
+  late TextEditingController _descriptionControl;
 
   @override
   void initState() {
     // TODO: implement initState
-    _phoneControl=TextEditingController();
-    _feedControl=TextEditingController();
+    _titleControl=TextEditingController();
+    _descriptionControl=TextEditingController();
     super.initState();
   }
 
   Future submitFeedback()async{
     FeedBack userModel = FeedBack(
       1,
-      _rememberCurrentUser.user.user_name,
-      _rememberCurrentUser.user.user_email,
-      _phoneControl.text.trim(),
-      _feedControl.text.trim(),
+      _rememberCurrentUser.user.user_id,
+      _titleControl.text.trim(),
+      _descriptionControl.text.trim(),
     );
     try{
       var res = await http.post(
@@ -514,7 +516,6 @@ class _FeedBackPageState extends State<FeedBackPage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const CorrectPage()),
-
             );
           });
         }else{
@@ -561,39 +562,13 @@ class _FeedBackPageState extends State<FeedBackPage> {
                 shrinkWrap: true,
                 childAspectRatio: 2.5,
                 children: [
-                  EnterInfoForm(textHint: 'Phone Number',controller: _phoneControl,),
+                  EnterInfoForm(textHint: 'Title',controller: _titleControl,),
                 ],
-              ),
-              Container(
-                  margin: EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8,vertical: 4),
-                        child: Text('Your service rating'),),
-                      RatingBar.builder(
-                        initialRating: 3,
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        itemCount: 5,
-                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                        itemBuilder: (context, _) => Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        onRatingUpdate: (rating) {
-                          print(rating);
-                        },
-                      ),
-                    ],
-                  )
               ),
               Container(
                 padding: EdgeInsets.all(8),
                 child: TextFormField(
-                  controller: _feedControl,
+                  controller: _descriptionControl,
                   maxLines: 7,
                   minLines: 7,
                   decoration: InputDecoration(
@@ -631,7 +606,7 @@ class _FeedBackPageState extends State<FeedBackPage> {
                       backgroundColor: MaterialStateProperty.all(Colors.black),
                     ),
                     onPressed: () {
-                      if(isChecked&&_phoneControl.text!=null&&_feedControl.text!=null){
+                      if(isFeedChecked&&_titleControl.text.isNotEmpty&&_descriptionControl.text.isNotEmpty){
                         submitFeedback();
                       }
                       //Navigator.pop(context);
@@ -652,6 +627,7 @@ class _FeedBackPageState extends State<FeedBackPage> {
     );
   }
 }
+
 class PinPage extends StatefulWidget {
   const PinPage({Key? key}) : super(key: key);
 
@@ -666,6 +642,17 @@ class _PinPageState extends State<PinPage> {
     // TODO: implement initState
     _pinControl=TextEditingController();
     super.initState();
+  }
+
+  checkPIN()async{
+    if(_rememberCurrentUser.user.user_PIN==_pinControl.text){
+      Navigator.pushNamed(
+          context,
+          '/qr'
+      );
+    }else{
+      Fluttertoast.showToast(msg: 'Wrong PIN');
+    }
   }
 
   @override
@@ -717,10 +704,7 @@ class _PinPageState extends State<PinPage> {
                     backgroundColor: MaterialStateProperty.all(Colors.black),
                   ),
                   onPressed: (){
-                    Navigator.pushNamed(
-                        context,
-                        '/qr'
-                    );
+                    checkPIN();
                   },
                   child: Text(
                     'Send PIN',
@@ -766,7 +750,7 @@ class CorrectPage extends StatelessWidget {
               ),
               SizedBox(height: 8,),
               Text(
-                'Your feedbacks has been sent.',
+                'Your Submission has been sent.',
                 style: TextStyle(
                   fontSize: 15,
                   color: Color(0xFF8391A1),
@@ -786,7 +770,7 @@ class CorrectPage extends StatelessWidget {
                     );
                   },
                   child: const Text(
-                    'Sign up',
+                    'Go to Main Page',
                     style: TextStyle(
                         color: Colors.white
                     ),
@@ -839,7 +823,9 @@ class EnterInfoForm extends StatelessWidget {
 }
 
 class CheckAgree extends StatefulWidget {
-  const CheckAgree({Key? key}) : super(key: key);
+  const CheckAgree({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<CheckAgree> createState() => _CheckAgreeState();
@@ -853,7 +839,7 @@ class _CheckAgreeState extends State<CheckAgree> {
         MaterialState.hovered,
         MaterialState.focused,
       };
-      if (isChecked==true) {
+      if (isFeedChecked==true) {
         return Colors.blue;
       }
       return Colors.grey;
@@ -861,13 +847,145 @@ class _CheckAgreeState extends State<CheckAgree> {
     return Checkbox(
       checkColor: Colors.white,
       fillColor: MaterialStateProperty.resolveWith(getColor),
-      value: isChecked,
+      value: isFeedChecked,
       onChanged: (bool? value) {
         setState(() {
-          isChecked = value!;
+          isFeedChecked = value!;
+          isUpdateChecked = value;
         });
       },
     );
   }
 }
 
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late TextEditingController _nameControl;
+  late TextEditingController _dobControl;
+  late TextEditingController _pinControl;
+
+  @override
+  void initState() {
+    _nameControl=TextEditingController();
+    _dobControl=TextEditingController();
+    _pinControl=TextEditingController();
+    // TODO: implement initState
+    super.initState();
+  }
+
+
+  Future submitUpdate()async{
+    try{
+      var res = await http.post(
+        Uri.parse(API.update),
+        body: {
+          'user_id':_rememberCurrentUser.user.user_id.toString(),
+          'user_name':_nameControl.text,
+          'user_DOB':_dobControl.text,
+          'user_PIN':_pinControl.text,
+        },
+      );
+      if(res.statusCode==200) {
+        var resBodyOfSignup = jsonDecode(res.body);
+        if (resBodyOfSignup['success'] == true) {
+          Fluttertoast.showToast(msg: "Update submitted");
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CorrectPage()),
+            );
+          });
+        }else{
+          Fluttertoast.showToast(msg: "Error, Try again");
+        }
+      }
+    }catch(e){
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _nameControl.text=_rememberCurrentUser.user.user_name;
+    _dobControl.text=_rememberCurrentUser.user.user_DOB.toString();
+    _pinControl.text=_rememberCurrentUser.user.user_PIN;
+    return Material(
+      child: MyScaffold(
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(horizontal:16, vertical: 8),
+                child: Row(
+                  children: [
+                    IconButton(
+                        onPressed: (){
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.arrow_back_ios)
+                    ),
+                    Text(
+                      'Profile',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              GridView.count(
+                physics: NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                childAspectRatio: 2.5,
+                children: [
+                  EnterInfoForm(textHint: 'Name',controller: _nameControl,),
+                  EnterInfoForm(textHint: 'Date of Birth',controller: _dobControl,),
+                  EnterInfoForm(textHint: 'PIN',controller: _pinControl,),
+                ],
+              ),
+              Row(
+                children: [
+                  CheckAgree(),
+                  const Text('I have read and accept the Update Policy.'),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                child: SizedBox(
+                  height: 46,
+                  width: 256,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black),
+                    ),
+                    onPressed: () {
+                      if(isUpdateChecked){
+                        submitUpdate();
+                      }
+                    },
+                    child: const Text(
+                      'Update information',
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
