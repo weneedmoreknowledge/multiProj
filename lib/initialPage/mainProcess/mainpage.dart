@@ -894,6 +894,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if(res.statusCode==200) {
         var resBodyOfSignup = jsonDecode(res.body);
         if (resBodyOfSignup['success'] == true) {
+          updateUserInfo();
           Fluttertoast.showToast(msg: "Update submitted");
           Future.delayed(Duration(seconds: 1), () {
             Navigator.push(
@@ -905,6 +906,16 @@ class _ProfilePageState extends State<ProfilePage> {
           Fluttertoast.showToast(msg: "Error, Try again");
         }
       }
+    }catch(e){
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+  Future updateUserInfo()async{
+    try{
+      _rememberCurrentUser.user.user_name=_nameControl.text;
+      _rememberCurrentUser.user.user_DOB=DateTime.parse(_dobControl.text);
+      _rememberCurrentUser.user.user_PIN=_pinControl.text;
     }catch(e){
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());

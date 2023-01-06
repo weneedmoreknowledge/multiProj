@@ -67,21 +67,29 @@ class FeedBack{
 }
 
 class History{
-  String user_email;
-  String checkDate;
+  int log_id;
+  int user_id;
+  DateTime time;
+  int check_in_out;
 
   History(
-      this.user_email,
-      this.checkDate
+      this.log_id,
+      this.user_id,
+      this.time,
+      this.check_in_out,
       );
 
   factory History.fromJson(Map<String,dynamic>json)=>History(
-    json["user_email"],
-    json["check_date"],
+    int.parse(json["log_id"]),
+    int.parse(json["user_id"]),
+    DateTime.parse(json['time']),
+    int.parse(json["check_in_out"]),
   );
 
   Map<String,dynamic> toJson()=>{
-    'user_email':user_email,
-    'check_date':checkDate,
+    'log_id':log_id.toString(),
+    'user_id':user_id.toString(),
+    'time':time.toString(),
+    'check_in_out':check_in_out.toString()
   };
 }
