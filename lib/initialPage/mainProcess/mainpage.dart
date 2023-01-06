@@ -5,83 +5,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:mysql1/mysql1.dart';
 
-import 'package:untitled/initialPage/loginpage.dart';
 import 'package:untitled/initialPage/model/current_user.dart';
 import 'package:untitled/initialPage/model/user.dart';
 
 import '../../api_connection/api_connection.dart';
 
-
-
 bool isFeedChecked = false;
 bool isUpdateChecked = false;
 final CurrentUser _rememberCurrentUser=Get.put(CurrentUser());
-
-class Loading extends StatelessWidget {
-  Loading({Key? key}) : super(key: key);
-
-  final Future<String> _calculation = Future<String>.delayed(
-    const Duration(seconds: 1),
-      ()=>'Complete',
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return GetBuilder(
-        init: CurrentUser(),
-        initState:(currentState){
-          _rememberCurrentUser.getUserInfo();
-          },
-        builder: (controller){
-          return DefaultTextStyle(
-            style: Theme.of(context).textTheme.displayMedium!,
-            textAlign: TextAlign.center,
-            child: FutureBuilder<String>(
-              future: _calculation, // a previously-obtained Future<String> or null
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                List<Widget> children;
-                if (snapshot.hasData) {
-                  children = const <Widget>[
-                    SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 16),
-                      child: Text('Awaiting result...'),
-                    ),
-                  ];
-                  Get.to(MainPage());
-                } else {
-                  children = const <Widget>[
-                    SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 16),
-                      child: Text('Awaiting result...'),
-                    ),
-                  ];
-                }
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: children,
-                  ),
-                );
-              },
-            ),
-          );
-        }
-    );
-  }
-}
-
 
 class MainPage extends StatefulWidget {
   const MainPage({
@@ -96,17 +28,24 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const InitialPage(),
-      routes: {
-        '/pro':(ctx) => const ProfilePage(),
-        '/qr': (ctx) => const QrPage(),
-        '/his':(ctx) => const HistoryPage(),
-        '/feed':(ctx) => const FeedBackPage(),
-        '/pin': (ctx) => const PinPage(),
-      },
-    );
+    return GetBuilder(
+        init: CurrentUser(),
+        initState:(currentState){
+          _rememberCurrentUser.getUserInfo();
+        },
+        builder: (controller){
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: const InitialPage(),
+            routes: {
+              '/pro':(ctx) => const ProfilePage(),
+              '/qr': (ctx) => const QrPage(),
+              '/his':(ctx) => const HistoryPage(),
+              '/feed':(ctx) => const FeedBackPage(),
+              '/pin': (ctx) => const PinPage(),
+            },
+      );
+    });
   }
 }
 
@@ -428,51 +367,87 @@ class QrPage extends StatelessWidget {
 }
 
 //Display User History Page
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({
-    Key? key
-  }) : super(key: key);
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({Key? key}) : super(key: key);
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  late var data;
+  bool error = false, dataloaded = false;
+
+  void loadHistory(){
+    Future.delayed(Duration.zero,()async{
+      var res=await http.post(Uri.parse(API.history));
+      if(res.statusCode==200){
+        data=json.decode(res.body);
+        dataloaded=true;
+      }else{
+        dataloaded = false;
+        error = true;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    loadHistory();
+    //calling loading of data
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<String> entries = <String>['A', 'B', 'C'];
-    final List<int> colorCodes = <int>[600, 500, 100];
-    return MyScaffold(
-        body:ListView.separated(
-          padding: const EdgeInsets.all(8),
-          itemCount: entries.length+1,
-          itemBuilder: (BuildContext context,int realIndex){
-            if(realIndex==0){
-             return Container(
-               child: Row(
-                 children: [
-                   IconButton(
-                       onPressed: (){
-                         Navigator.pop(context);
-                       },
-                       icon: Icon(Icons.arrow_back_ios)
-                   ),
-                   Text(
-                     'History',
-                     style: TextStyle(
-                       fontSize: 24,
-                       fontWeight: FontWeight.w500
-                     ),
-                   )
-                 ],
-               ),
-             );
-            }
-            else {
-              int index = realIndex-1;
-              return Container(
-                height: 50,
-                color: Colors.amber[colorCodes[index]],
-                child: Center(child: Text('Entry ${entries[index]}')),
-              );
-            }
-          },
-          separatorBuilder: (BuildContext context, int index) => const Divider(),
-        ),
+    return FutureBuilder(
+        builder: (context,snapshot){
+          return MyScaffold(
+            body:dataloaded?ListOfHistory(): CircularProgressIndicator(),
+          );
+        }
+    );
+  }
+
+  Widget ListOfHistory(){
+    List<History> historyList = List<History>.from(data["data"].map((i){
+      return History.fromJson(i);
+    })
+    );
+    return ListView.separated(
+      padding: const EdgeInsets.all(8),
+      itemCount: historyList.length+1,
+      itemBuilder: (BuildContext context,int realIndex){
+        if(realIndex==0){
+          return Container(
+            child: Row(
+              children: [
+                IconButton(
+                    onPressed: (){
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back_ios)
+                ),
+                Text(
+                  'History',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500
+                  ),
+                )
+              ],
+            ),
+          );
+        }
+        else {
+          int index = realIndex-1;
+          return Container(
+            height: 50,
+            child: Center(child: Text('${historyList[index].user_id} : ${historyList[index].time} : ${historyList[index].check_in_out}')),
+          );
+        }
+      },
+      separatorBuilder: (BuildContext context, int index) => const Divider(),
     );
   }
 }
@@ -878,7 +853,6 @@ class _ProfilePageState extends State<ProfilePage> {
     // TODO: implement initState
     super.initState();
   }
-
 
   Future submitUpdate()async{
     try{
