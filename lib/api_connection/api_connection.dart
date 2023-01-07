@@ -9,4 +9,6 @@ class API{
   static const feedback = '$hostConnectUser/feedback.php';
   static const update = '$hostConnectUser/update.php';
   static const history = '$hostConnectUser/history.php';
+  static const newPIN = '$hostConnectUser/newPIN.php';
+
 }
