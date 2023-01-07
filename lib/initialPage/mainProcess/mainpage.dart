@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,6 +14,7 @@ import '../../api_connection/api_connection.dart';
 
 bool isFeedChecked = false;
 bool isUpdateChecked = false;
+bool isLoading=false;
 final CurrentUser _rememberCurrentUser=Get.put(CurrentUser());
 
 class MainPage extends StatefulWidget {
@@ -34,9 +36,10 @@ class _MainPageState extends State<MainPage> {
           _rememberCurrentUser.getUserInfo();
         },
         builder: (controller){
+          sleep(Duration(milliseconds:100));
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: const InitialPage(),
+            home: const Loading(),
             routes: {
               '/pro':(ctx) => const ProfilePage(),
               '/qr': (ctx) => const QrPage(),
@@ -49,65 +52,89 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+class Loading extends StatefulWidget {
+  const Loading({Key? key}) : super(key: key);
+
+  @override
+  State<Loading> createState() => _LoadingState();
+}
+
+class _LoadingState extends State<Loading> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    loading();
+    super.initState();
+  }
+  Future loading()async{
+    setState(() {
+      isLoading=true;
+    });
+    return isLoading;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: loading(),
+        builder:(ctx,snap){
+          return snap.data==true?InitialPage():CircularProgressIndicator();
+    });
+  }
+}
+
+
 class MyScaffold extends StatelessWidget {
   MyScaffold({Key? key, required this.body}) : super(key: key);
   final Widget body;
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder(
-        init: CurrentUser(),
-        initState:(currentState){
-          _rememberCurrentUser.getUserInfo();
-        },
-        builder: (controller){
-          return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false, // Don't show the leading button
-              toolbarHeight: 130,
-              backgroundColor:Color(0xFF2A2A37),
-              centerTitle: false,
-              actions: [
-                CircleAvatar(
-                  radius: 43,
-                  backgroundImage:AssetImage('assets/images/profile.png'),
-                ),
-                SizedBox(width: 16,)
-              ],
-              title: Container(
-                //padding: EdgeInsets.symmetric(horizontal: 16),
-                width: double.infinity,
-                child: Row(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _rememberCurrentUser.user.user_name,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                          ),
-                        ),
-                        SizedBox(height: 4,),
-                        Text(
-                          'Member',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false, // Don't show the leading button
+        toolbarHeight: 130,
+        backgroundColor:Color(0xFF2A2A37),
+        centerTitle: false,
+        actions: [
+          CircleAvatar(
+            radius: 43,
+            backgroundImage:AssetImage('assets/images/profile.png'),
+          ),
+          SizedBox(width: 16,)
+        ],
+        title: Container(
+          //padding: EdgeInsets.symmetric(horizontal: 16),
+          width: double.infinity,
+          child: Row(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _rememberCurrentUser.user.user_name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 4,),
+                  Text(
+                    'Member',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            backgroundColor: Colors.white,
-            body: body,
-          );
-        }
-        );
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      body: body,
+    );
   }
 }
 
@@ -375,79 +402,60 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  late var data;
-  bool error = false, dataloaded = false;
 
-  void loadHistory(){
-    Future.delayed(Duration.zero,()async{
-      var res=await http.post(Uri.parse(API.history));
-      if(res.statusCode==200){
-        data=json.decode(res.body);
-        dataloaded=true;
-      }else{
-        dataloaded = false;
-        error = true;
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    loadHistory();
-    //calling loading of data
-    super.initState();
+  Future getContactData()async{
+    var res= await http.get(Uri.parse(API.history));
+    return json.decode(res.body);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        builder: (context,snapshot){
-          return MyScaffold(
-            body:dataloaded?ListOfHistory(): CircularProgressIndicator(),
-          );
+    return MyScaffold(
+        body: FutureBuilder(
+        future: getContactData(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          if(snapshot.hasError) {
+            Fluttertoast.showToast(msg:snapshot.error.toString());
+            print(snapshot.error);
+          }
+          return snapshot.hasData?
+          ListView.builder(
+              itemCount: snapshot.data.length+1,
+              itemBuilder: (context,index){
+                List historyList = snapshot.data;
+                int realIndex=index-1;
+                if(index==0){
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal:16, vertical: 8),
+                    child: Row(
+                      children: [
+                        IconButton(
+                            onPressed: (){
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(Icons.arrow_back_ios)
+                        ),
+                        Text(
+                          'History',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                }
+                //if(historyList[realIndex]['user_id']==_rememberCurrentUser.user.user_id)
+                  return ListTile(
+                    title: Text(historyList[realIndex]['check_in_out']),
+                    leading: Text(historyList[realIndex]['user_id']),
+                  );
+                //return Container();
+              })
+              :CircularProgressIndicator();
         }
-    );
-  }
-
-  Widget ListOfHistory(){
-    List<History> historyList = List<History>.from(data["data"].map((i){
-      return History.fromJson(i);
-    })
-    );
-    return ListView.separated(
-      padding: const EdgeInsets.all(8),
-      itemCount: historyList.length+1,
-      itemBuilder: (BuildContext context,int realIndex){
-        if(realIndex==0){
-          return Container(
-            child: Row(
-              children: [
-                IconButton(
-                    onPressed: (){
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.arrow_back_ios)
-                ),
-                Text(
-                  'History',
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500
-                  ),
-                )
-              ],
-            ),
-          );
-        }
-        else {
-          int index = realIndex-1;
-          return Container(
-            height: 50,
-            child: Center(child: Text('${historyList[index].user_id} : ${historyList[index].time} : ${historyList[index].check_in_out}')),
-          );
-        }
-      },
-      separatorBuilder: (BuildContext context, int index) => const Divider(),
+    )
     );
   }
 }

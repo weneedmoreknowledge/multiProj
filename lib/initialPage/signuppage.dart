@@ -72,7 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
       _controllerEmail.text.trim(),
       _controllerPass.text.trim(),
       _controllerGender.text.trim(),
-      DateTime.parse(_controllerDOB.text),
+      DateTime.parse(_controllerDOB.text.trim()),
       _controllerPIN.text.trim(),
     );
     try{

@@ -37,8 +37,8 @@ class _LoginPageState extends State<LoginPage> {
       var res = await http.post(
         Uri.parse(API.login),
         body: {
-          'user_email':_controllerEmail.text.trim(),
-          'user_password':_controllerPassword.text.trim(),
+          'mail':_controllerEmail.text.trim(),
+          'pass':_controllerPassword.text.trim(),
         },
       );
       if(res.statusCode==200){
