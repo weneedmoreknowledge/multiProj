@@ -5,7 +5,7 @@ class User{
   String user_password;
   String user_gender;
   DateTime user_DOB;
-  String user_PIN;
+  int user_PIN;
 
   User(
       this.user_id,
@@ -24,17 +24,17 @@ class User{
     json["pass"],
     json["gender"],
     DateTime.parse(json["DOB"]),
-    json["PIN"],
+    int.parse(json["PIN"]),
   );
 
   Map<String,dynamic> toJson()=>{
-    'user_id':user_id.toString(),
-    'user_name':user_name,
-    'mail':user_email,
-    'pass':user_password,
-    'gender':user_gender,
-    'DOB':user_DOB.toString(),
-    'PIN':user_PIN,
+    "user_id":user_id.toString(),
+    "user_name":user_name,
+    "mail":user_email,
+    "pass":user_password,
+    "gender":user_gender,
+    "DOB":user_DOB.toString(),
+    "PIN":user_PIN.toString(),
   };
 }
 
@@ -55,14 +55,14 @@ class FeedBack{
     int.parse(json["report_id"]),
     int.parse(json["user_id"]),
     json["title"],
-    json["feed_contents"],
+    json["description"],
   );
 
   Map<String,dynamic> toJson()=>{
     'report_id':id.toString(),
     'user_id':user_id.toString(),
     'title':title,
-    'feed_contents':feed_contents
+    'description':feed_contents
   };
 }
 

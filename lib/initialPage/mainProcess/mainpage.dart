@@ -402,7 +402,7 @@ class _QrPageState extends State<QrPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               QrImage(
-                data: _rememberCurrentUser.user.user_email,
+                data: _rememberCurrentUser.user.user_id.toString(),
                 version: QrVersions.auto,
                 size: 240.0,
               ),
@@ -694,7 +694,7 @@ class _PinPageState extends State<PinPage> {
   }
 
   checkPIN()async{
-    if(_rememberCurrentUser.user.user_PIN==_pinControl.text){
+    if(_rememberCurrentUser.user.user_PIN==int.parse(_pinControl.text)){
       Navigator.pushNamed(
           context,
           '/qr'

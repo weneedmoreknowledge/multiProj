@@ -73,7 +73,7 @@ class _SignUpPageState extends State<SignUpPage> {
       _controllerPass.text.trim(),
       _controllerGender.text.trim(),
       DateTime.parse(_controllerDOB.text.trim()),
-      _controllerPIN.text.trim(),
+      int.parse(_controllerPIN.text.trim()),
     );
     try{
       var res = await http.post(
